@@ -4,3 +4,4 @@ dist/
 tsconfig.tsbuildinfo
 /.build/
 /.idea/
+profiles/.env.development.local
