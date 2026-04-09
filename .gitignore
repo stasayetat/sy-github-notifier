@@ -3,3 +3,4 @@ dist/
 **/**/*.log
 tsconfig.tsbuildinfo
 /.build/
+/.idea/
