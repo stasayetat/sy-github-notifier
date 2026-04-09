@@ -1,7 +1,7 @@
 import { GithubApiClient } from '@shared/apis/github.api-client';
 import { NotificationEmailService } from '@shared/email/notification.email-service';
 import { logger } from '@shared/logger';
-import { E, MinifiedSubscription, Subscription, SubscriptionResponse } from '@shared/types';
+import { ApiResponse, E, GetSubscriptionsResponse, MinifiedSubscription, Subscription } from '@shared/types';
 import { Repository } from '@shared/types/repository.types';
 
 import { RepoRepository } from '../repository/repo.repository';
@@ -14,7 +14,7 @@ export class SubscriptionService {
     private readonly notificationEmailService = new NotificationEmailService(),
   ) {}
 
-  async subscribe(email: string, repo: string): Promise<SubscriptionResponse> {
+  async subscribe(email: string, repo: string): Promise<ApiResponse> {
     const foundRepo = await this.repoRepository.findByRepo(repo);
 
     if (foundRepo) {
@@ -24,7 +24,7 @@ export class SubscriptionService {
     return await this.subscribeToNewRepo(email, repo);
   }
 
-  async confirmSubscribe(token: string): Promise<SubscriptionResponse> {
+  async confirmSubscribe(token: string): Promise<ApiResponse> {
     const foundSubscriptionEither = await this.findSubscriptionByTokenOrFail(token);
 
     if (E.isLeft(foundSubscriptionEither)) {
@@ -38,7 +38,7 @@ export class SubscriptionService {
     return { status: 200, message: 'Subscription confirmed successfully' };
   }
 
-  async confirmUnsubscribe(token: string): Promise<SubscriptionResponse> {
+  async confirmUnsubscribe(token: string): Promise<ApiResponse> {
     const foundSubscriptionEither = await this.findSubscriptionByTokenOrFail(token, true);
 
     if (E.isLeft(foundSubscriptionEither)) {
@@ -53,7 +53,7 @@ export class SubscriptionService {
     return { status: 200, message: 'Subscription removed successfully' };
   }
 
-  async getAllSubscriptionsByEmail(email: string): Promise<{ status: number; data: MinifiedSubscription[] }> {
+  async getAllSubscriptionsByEmail(email: string): Promise<GetSubscriptionsResponse> {
     const foundSubscriptions = await this.subscriptionRepository.getAllActiveSubscriptionByEmail(email);
 
     const mappedValue = foundSubscriptions.map<MinifiedSubscription>(({ repos, subscriptions }) => ({
@@ -71,7 +71,7 @@ export class SubscriptionService {
   private async findSubscriptionByTokenOrFail(
     token: string,
     isConfirmed: boolean = false,
-  ): Promise<E.Either<SubscriptionResponse, Subscription>> {
+  ): Promise<E.Either<ApiResponse, Subscription>> {
     const subscription = await this.subscriptionRepository.getSubscriptionByToken(token, isConfirmed);
 
     if (!subscription) {
@@ -101,7 +101,7 @@ export class SubscriptionService {
     email: string,
     subscription: Subscription,
     repo: string,
-  ): Promise<SubscriptionResponse> {
+  ): Promise<ApiResponse> {
     if (subscription.confirmed) {
       logger.info(`Subscription for ${subscription.repoId} from ${email} already exists`);
 

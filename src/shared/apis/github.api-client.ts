@@ -1,7 +1,7 @@
 import { env } from '@shared/env';
 import { logger } from '@shared/logger';
 import { getOrSet } from '@shared/redis';
-import { ApiError, E, LatestReleaseResponse } from '@shared/types';
+import { ApiResponse, E, LatestReleaseResponse } from '@shared/types';
 import { getErrorMessage } from '@shared/utils';
 import { resolveRetryAfterMs } from '@shared/utils/github.utils';
 import axios, { AxiosRequestConfig } from 'axios';
@@ -19,7 +19,7 @@ export namespace GithubApiClient {
     },
   };
 
-  export const getLatestRelease = (repo: string): Promise<E.Either<ApiError, LatestReleaseResponse>> => {
+  export const getLatestRelease = (repo: string): Promise<E.Either<ApiResponse, LatestReleaseResponse>> => {
     return getOrSet(
       `github:release:${repo}`,
       ms('10 minutes'),
@@ -28,7 +28,7 @@ export namespace GithubApiClient {
     );
   };
 
-  const getSimple = async <T>(path: string): Promise<E.Either<ApiError, T>> => {
+  const getSimple = async <T>(path: string): Promise<E.Either<ApiResponse, T>> => {
     try {
       const response = await axios.get<T>(baseUrl + path, GITHUB_AUTH_HEADERS);
 

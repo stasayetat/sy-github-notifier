@@ -1,9 +1,9 @@
-import { ApiError, LatestReleaseResponse, Subscription } from '@shared/types';
+import { ApiResponse, LatestReleaseResponse, Subscription } from '@shared/types';
 import { Repository } from '@shared/types/repository.types';
 
 export type RepoScanError = {
   currentRepo: Repository;
-  error: ApiError;
+  error: ApiResponse;
 };
 
 export type RepoScanSuccess = {

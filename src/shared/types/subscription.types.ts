@@ -10,4 +10,4 @@ export type MinifiedSubscription = {
   last_seen_tag: string;
 };
 
-export type SubscriptionResponse = { status: number; message: string };
+export type GetSubscriptionsResponse = { status: number; data: MinifiedSubscription[] };
