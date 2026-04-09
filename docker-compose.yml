@@ -1,0 +1,41 @@
+services:
+  postgres:
+    container_name: github-notifier-postgres
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: github_notifier
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./profiles/.env.production
+    environment:
+      NODE_ENV: production
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "8081:8081"
+    command: sh -c "node .build/shared/db/migrate.js && node .build/main.js"
+
+volumes:
+  postgres_data:

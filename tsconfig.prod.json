@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./.build",
+    "sourceMap": false,
+    "incremental": false,
+    "types": [],
+    "paths": {
+      "@shared/*": ["./src/shared/*"]
+    }
+  },
+  "exclude": [".build", "tests", "vitest.config.mts"]
+}
