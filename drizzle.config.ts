@@ -1,5 +1,5 @@
+import { env } from '@shared/env';
 import { defineConfig } from 'drizzle-kit';
-import { env } from './src/shared/env';
 
 export default defineConfig({
   schema: './src/shared/db/schema.ts',
