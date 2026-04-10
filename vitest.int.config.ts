@@ -6,6 +6,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     isolate: true,
+    globalSetup: 'tests/integration/globalSetup.ts',
     include: ['tests/**/*.int.{spec,test}.ts'],
     env: {
       DOTENV_CONFIG_PATH: 'profiles/.env.test',
