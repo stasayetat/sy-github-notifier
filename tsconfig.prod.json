@@ -7,7 +7,8 @@
     "incremental": false,
     "types": [],
     "paths": {
-      "@shared/*": ["./src/shared/*"]
+      "@shared/*": ["./src/shared/*"],
+      "@modules/*": ["./src/modules/*"]
     }
   },
   "exclude": [

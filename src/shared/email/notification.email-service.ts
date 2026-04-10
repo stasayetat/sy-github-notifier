@@ -6,6 +6,7 @@ import {
 } from '@shared/email/email.utils';
 import { emailApiClient } from '@shared/email/index';
 import { logger } from '@shared/logger';
+import { emailSentTotal } from '@shared/metrics';
 import { getErrorMessage } from '@shared/utils';
 
 export class NotificationEmailService {
@@ -14,8 +15,12 @@ export class NotificationEmailService {
       await emailApiClient.sendEmail(to, EMAIL_SUBJECT_CONFIRMATION, confirmationEmailTemplate(token, repo));
 
       logger.info(`User ${to} has recevied confirmation email`);
+
+      emailSentTotal.inc({ type: 'confirmation', status: 'success' });
     } catch (error) {
       const message = getErrorMessage(error);
+
+      emailSentTotal.inc({ type: 'confirmation', status: 'failed' });
 
       logger.error(`Failed to send confirmation ${to}: ${message}`);
     }
@@ -30,8 +35,12 @@ export class NotificationEmailService {
       );
 
       logger.info(`User ${to} has recevied release notification about ${repo}`);
+
+      emailSentTotal.inc({ type: 'release', status: 'success' });
     } catch (error) {
       const message = getErrorMessage(error);
+
+      emailSentTotal.inc({ type: 'release', status: 'failed' });
 
       logger.error(`Failed to notify ${to}: ${message}`);
     }

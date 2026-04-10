@@ -1,5 +1,6 @@
 import { env } from '@shared/env';
 import { logger } from '@shared/logger';
+import { githubApiDuration, githubApiRequestsTotal } from '@shared/metrics/github.metrics';
 import { getOrSet } from '@shared/redis';
 import { ApiResponse, E, LatestReleaseResponse } from '@shared/types';
 import { getErrorMessage } from '@shared/utils';
@@ -29,11 +30,16 @@ export namespace GithubApiClient {
   };
 
   const getSimple = async <T>(path: string): Promise<E.Either<ApiResponse, T>> => {
+    const end = githubApiDuration.startTimer();
+
     try {
       const response = await axios.get<T>(baseUrl + path, GITHUB_AUTH_HEADERS);
 
       if (response.status === 429) {
         const retryAfterMs = resolveRetryAfterMs(response);
+
+        githubApiRequestsTotal.inc({ status: 'rate_limited' });
+        end({ status: 'rate_limited' });
 
         return E.left({
           status: 429,
@@ -43,12 +49,20 @@ export namespace GithubApiClient {
       }
 
       if (response.status !== 200) {
+        githubApiRequestsTotal.inc({ status: 'failed' });
+        end({ status: 'rate_limited' });
+
         return E.left({ status: response.status, message: String(response.data) });
       }
+
+      githubApiRequestsTotal.inc({ status: 'success' });
+      end({ status: 'success' });
 
       return E.right(response.data);
     } catch (error: unknown) {
       const message = getErrorMessage(error);
+
+      githubApiRequestsTotal.inc({ status: 'error' });
 
       logger.error(`Error getting latest release: ${message}`);
 

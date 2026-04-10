@@ -1,10 +1,13 @@
 import { db, repos, subscriptions } from '@shared/db';
+import { activeSubscriptionCount } from '@shared/metrics';
 import { Subscription } from '@shared/types';
 import { and, eq, inArray } from 'drizzle-orm';
 
 export class SubscriptionRepository {
   async createNewSubscription(email: string, repoId: string) {
     const [newSubscription] = await db.insert(subscriptions).values({ email, repoId }).returning();
+
+    activeSubscriptionCount.inc();
 
     return newSubscription;
   }
@@ -15,6 +18,8 @@ export class SubscriptionRepository {
 
   async removeSubscription(subscription: Subscription) {
     await db.delete(subscriptions).where(eq(subscriptions.id, subscription.id));
+
+    activeSubscriptionCount.dec();
   }
 
   getAllActiveSubscriptionByEmail(email: string) {

@@ -1,6 +1,7 @@
 import { GithubApiClient } from '@shared/apis';
 import { NotificationEmailService } from '@shared/email';
 import { logger } from '@shared/logger';
+import { emailSentTotal, subscriptionsTotal } from '@shared/metrics';
 import { ApiResponse, E, GetSubscriptionsResponse, MinifiedSubscription, Subscription } from '@shared/types';
 import { Repository } from '@shared/types/repository.types';
 
@@ -28,6 +29,8 @@ export class SubscriptionService {
     const foundSubscriptionEither = await this.findSubscriptionByTokenOrFail(token);
 
     if (E.isLeft(foundSubscriptionEither)) {
+      subscriptionsTotal.inc({ status: 'token_not_found' });
+
       return foundSubscriptionEither.value;
     }
 
@@ -49,6 +52,8 @@ export class SubscriptionService {
     await this.removeRepoIfEmpty(foundSubscriptionEither);
 
     logger.info(`Subscription removed successfully for ${token}`);
+
+    subscriptionsTotal.inc({ status: 'unsubscribed' });
 
     return { status: 200, message: 'Subscription removed successfully' };
   }
@@ -94,6 +99,8 @@ export class SubscriptionService {
 
     await this.notificationEmailService.sendConfirmationEmail(email, newSubscription.token, repository.repo);
 
+    emailSentTotal.inc({ type: 'confirmation', status: 'success' });
+
     return { status: 200, message: 'Confirmation email sent' };
   }
 
@@ -105,12 +112,16 @@ export class SubscriptionService {
     if (subscription.confirmed) {
       logger.info(`Subscription for ${subscription.repoId} from ${email} already exists`);
 
+      subscriptionsTotal.inc({ status: 'already_exists' });
+
       return { status: 409, message: 'Subscription already exists' };
     }
 
     logger.info(`Subscription for ${subscription.repoId} from ${email} already exists but not confirmed`);
 
     await this.notificationEmailService.sendConfirmationEmail(email, subscription.token, repo);
+
+    subscriptionsTotal.inc({ status: 'resent' });
 
     return { status: 200, message: 'Confirmation email resent' };
   }
@@ -121,6 +132,8 @@ export class SubscriptionService {
     if (E.isLeft(foundRepoEither)) {
       logger.info(`Something went wrong. Message: ${foundRepoEither.value.message}`);
 
+      subscriptionsTotal.inc({ status: 'repo_not_found' });
+
       return foundRepoEither.value;
     }
 
@@ -130,6 +143,8 @@ export class SubscriptionService {
     await this.notificationEmailService.sendConfirmationEmail(email, newSubscription.token, repo);
 
     logger.info(`Confirmation for ${repo} successfully sent to ${email}`);
+
+    subscriptionsTotal.inc({ status: 'created' });
 
     return { status: 200, message: 'Confirmation email sent' };
   }

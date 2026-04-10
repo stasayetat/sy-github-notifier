@@ -1,4 +1,5 @@
 import { db, repos } from '@shared/db';
+import { totalReposCount } from '@shared/metrics';
 import { Repository } from '@shared/types/repository.types';
 import { eq } from 'drizzle-orm';
 
@@ -12,11 +13,15 @@ export class RepoRepository {
   async createRepo(repo: string, lastSeenTag: string): Promise<Repository> {
     const [newRepo] = await db.insert(repos).values({ repo, last_seen_tag: lastSeenTag }).returning();
 
+    totalReposCount.inc();
+
     return newRepo;
   }
 
   async deleteRepo(repoId: string): Promise<void> {
     await db.delete(repos).where(eq(repos.id, repoId));
+
+    totalReposCount.dec();
   }
 
   getAllRepos(): Promise<Repository[]> {

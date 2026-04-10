@@ -1,6 +1,7 @@
 import { GithubApiClient } from '@shared/apis';
 import { NotificationEmailService } from '@shared/email';
 import { logger } from '@shared/logger';
+import { scannerRunDuration } from '@shared/metrics';
 import { E, Subscription } from '@shared/types';
 import { Repository } from '@shared/types/repository.types';
 import Bottleneck from 'bottleneck';
@@ -26,46 +27,52 @@ export class ScannerService {
   ) {}
 
   async run(): Promise<void> {
-    logger.info('Start scanning...');
-    const allRepos = await this.repoRepository.getAllRepos();
+    const end = scannerRunDuration.startTimer();
 
-    if (!allRepos.length) {
-      logger.info(`There is no repos. Finishing job...`);
+    try {
+      logger.info('Start scanning...');
+      const allRepos = await this.repoRepository.getAllRepos();
 
-      return;
+      if (!allRepos.length) {
+        logger.info(`There is no repos. Finishing job...`);
+
+        return;
+      }
+
+      const successful = await this.scanAllRepos(allRepos);
+
+      logger.info(`Scanned ${successful.length} repos`);
+
+      const repoToNotify = successful.filter(hasNewRelease);
+
+      if (!repoToNotify.length) {
+        logger.info('No repos to notify. Finishing job...');
+
+        return;
+      }
+
+      logger.info(`Repos ready to notify: ${repoToNotify.length}`);
+
+      const repoIds = repoToNotify.map(repo => repo.currentRepo.id);
+
+      const subscriptions = await this.subscriptionRepository.getSubscriptionsByRepoIds(repoIds);
+
+      if (!subscriptions.length) {
+        logger.info(`There is no subscriptions. Finishing job...`);
+
+        return;
+      }
+
+      logger.info(`Subscribers ready to notify: ${repoToNotify.length}`);
+
+      const notifyInfos = this.buildNotifyInfos(repoToNotify, subscriptions);
+
+      await Promise.all(notifyInfos.map(info => this.notifySubscribers(info)));
+
+      logger.info(`Scanning successfully end`);
+    } finally {
+      end();
     }
-
-    const successful = await this.scanAllRepos(allRepos);
-
-    logger.info(`Scanned ${successful.length} repos`);
-
-    const repoToNotify = successful.filter(hasNewRelease);
-
-    if (!repoToNotify.length) {
-      logger.info('No repos to notify. Finishing job...');
-
-      return;
-    }
-
-    logger.info(`Repos ready to notify: ${repoToNotify.length}`);
-
-    const repoIds = repoToNotify.map(repo => repo.currentRepo.id);
-
-    const subscriptions = await this.subscriptionRepository.getSubscriptionsByRepoIds(repoIds);
-
-    if (!subscriptions.length) {
-      logger.info(`There is no subscriptions. Finishing job...`);
-
-      return;
-    }
-
-    logger.info(`Subscribers ready to notify: ${repoToNotify.length}`);
-
-    const notifyInfos = this.buildNotifyInfos(repoToNotify, subscriptions);
-
-    await Promise.all(notifyInfos.map(info => this.notifySubscribers(info)));
-
-    logger.info(`Scanning successfully end`);
   }
 
   private async notifySubscribers({ subscribers, newTag, repo }: RepoNotifyInfo) {
