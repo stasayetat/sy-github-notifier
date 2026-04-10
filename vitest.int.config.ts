@@ -1,21 +1,21 @@
 import path from 'path';
 import { defineConfig } from 'vitest/config';
 
-const config = defineConfig({
+export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
     isolate: true,
+    include: ['tests/**/*.int.{spec,test}.ts'],
     env: {
       DOTENV_CONFIG_PATH: 'profiles/.env.test',
     },
+    fileParallelism: false
   },
   resolve: {
     alias: {
-      '@src': path.resolve(__dirname, './src'),
       '@shared': path.resolve(__dirname, './src/shared'),
+      '@modules': path.resolve(__dirname, './src/modules'),
     },
   },
 });
-
-export default config;

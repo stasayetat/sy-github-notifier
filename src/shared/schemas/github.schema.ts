@@ -18,7 +18,7 @@ export const RepositoryResponseSchema = zod.object({
   id: zod.number(),
   name: zod.string(),
   full_name: zod.string(),
-  private: zod.boolean(), // TODO: check on private repos
+  private: zod.boolean(),
   owner: zod.object({
     login: zod.string(),
     id: zod.number(),

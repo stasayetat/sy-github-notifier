@@ -1,7 +1,6 @@
-// tests/scanner/scanner.utils.unit.test.ts
 import { describe, expect, it } from 'vitest';
 
-import { hasNewRelease } from '../../src/modules/scanner/scanner.utils';
+import { hasNewRelease } from '../../../src/modules/scanner/scanner.utils';
 
 const mockRepo = {
   id: 'repo-uuid',

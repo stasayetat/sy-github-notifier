@@ -22,13 +22,15 @@
     "incremental": true,
     "types": ["vitest/globals"],
     "paths": {
-      "@shared/*": ["./src/shared/*"]
+      "@shared/*": ["./src/shared/*"],
+      "@modules/*": ["./src/modules/*"]
     }
   },
   "include": [
     "src/**/*.ts",
     "tests/**/*.ts",
-    "vitest.config.mts"
+    "vitest.unit.config.ts",
+    "vitest.int.config.ts"
   ],
   "exclude": [".build"],
 }

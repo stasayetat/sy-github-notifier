@@ -1,5 +1,5 @@
-import { GithubApiClient } from '@shared/apis/github.api-client';
-import { NotificationEmailService } from '@shared/email/notification.email-service';
+import { GithubApiClient } from '@shared/apis';
+import { NotificationEmailService } from '@shared/email';
 import { logger } from '@shared/logger';
 import { E, Subscription } from '@shared/types';
 import { Repository } from '@shared/types/repository.types';

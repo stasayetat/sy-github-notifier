@@ -2,7 +2,7 @@ import express from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
-import { subscriptionRouter } from '../../src/modules/subscription/subcription.controller';
+import { subscriptionRouter } from '../../../src/modules/subscription/subcription.controller';
 
 
 const app = express();

@@ -1,11 +1,11 @@
+import { RepoRepository } from '@modules/subscription/repository/repo.repository';
+import { SubscriptionRepository } from '@modules/subscription/repository/subscription.repository';
 import { GithubApiClient } from '@shared/apis/github.api-client';
 import { NotificationEmailService } from '@shared/email/notification.email-service';
 import { E } from '@shared/types';
 import { beforeEach, describe, expect, it, MockedObject, vi } from 'vitest';
 
-import { RepoRepository } from '../../src/modules/subscription/repository/repo.repository';
-import { SubscriptionRepository } from '../../src/modules/subscription/repository/subscription.repository';
-import { SubscriptionService } from '../../src/modules/subscription/service/subscription.service';
+import { SubscriptionService } from '../../../src/modules/subscription/service/subscription.service';
 
 vi.mock('@shared/email', () => ({
   emailService: {
@@ -89,7 +89,7 @@ describe('SubscriptionService', () => {
 
       expect(result.status).toBe(200);
       expect(result.message).toBe('Confirmation email resent');
-      expect(notificationEmailService.sendConfirmationEmail).toHaveBeenCalledWith('test@gmail.com', mockSubscription.token);
+      expect(notificationEmailService.sendConfirmationEmail).toHaveBeenCalledWith('test@gmail.com', mockSubscription.token, 'owner/repo');
     });
 
     it('should return 404 if github repo has no releases', async () => {
@@ -114,7 +114,7 @@ describe('SubscriptionService', () => {
       expect(result.message).toBe('Confirmation email sent');
       expect(repoRepository.createRepo).toHaveBeenCalledWith('owner/repo', mockRelease.tag_name);
       expect(subscriptionRepository.createNewSubscription).toHaveBeenCalledWith('test@gmail.com', mockRepo.id);
-      expect(notificationEmailService.sendConfirmationEmail).toHaveBeenCalledWith('test@gmail.com', mockSubscription.token);
+      expect(notificationEmailService.sendConfirmationEmail).toHaveBeenCalledWith('test@gmail.com', mockSubscription.token, 'owner/repo');
     });
 
     it('should create subscription for existing repo', async () => {

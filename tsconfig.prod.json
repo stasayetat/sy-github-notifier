@@ -10,5 +10,5 @@
       "@shared/*": ["./src/shared/*"]
     }
   },
-  "exclude": [".build", "tests", "vitest.config.mts"]
+  "exclude": [".build", "tests", "vitest.int.config.ts", "vitest.unit.config.ts"]
 }

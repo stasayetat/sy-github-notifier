@@ -1,10 +1,8 @@
-// tests/github/github.api-client.unit.test.ts
-import { redis } from '@shared/redis/redis.client';
+import { GithubApiClient } from '@shared/apis';
+import { redis } from '@shared/redis';
 import { E } from '@shared/types';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { GithubApiClient } from '../../src/shared/apis/github.api-client';
 
 vi.mock('axios');
 vi.mock('@shared/redis/redis.client', () => ({

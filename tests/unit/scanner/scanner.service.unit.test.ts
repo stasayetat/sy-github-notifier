@@ -1,13 +1,12 @@
-import { GithubApiClient } from '@shared/apis/github.api-client';
+import { ScannerService } from '@modules/scanner/service/scanner.service';
+import { RepoRepository } from '@modules/subscription/repository/repo.repository';
+import { SubscriptionRepository } from '@modules/subscription/repository/subscription.repository';
+import { GithubApiClient } from '@shared/apis';
 import { NotificationEmailService } from '@shared/email/notification.email-service';
 import { E } from '@shared/types';
 import { beforeEach, describe, expect, it, MockedObject, vi } from 'vitest';
 
-import { ScannerService } from '../../src/modules/scanner/service/scanner.service';
-import { RepoRepository } from '../../src/modules/subscription/repository/repo.repository';
-import { SubscriptionRepository } from '../../src/modules/subscription/repository/subscription.repository';
-
-vi.mock('@shared/apis/github.api-client', () => ({
+vi.mock('@shared/apis', () => ({
   GithubApiClient: {
     getLatestRelease: vi.fn(),
   },

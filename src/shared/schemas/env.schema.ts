@@ -1,3 +1,4 @@
+import { CoerceStringToBoolean } from '@shared/utils';
 import zod from 'zod';
 
 export const EnvironmentSchema = zod.object({
@@ -18,4 +19,6 @@ export const EnvironmentSchema = zod.object({
   REDIS_PORT: zod.coerce.number(),
 
   APP_API_KEY: zod.string(),
+
+  LAUNCH_TEST_CONTAINERS: CoerceStringToBoolean,
 });
