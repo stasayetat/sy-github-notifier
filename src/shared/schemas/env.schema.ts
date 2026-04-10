@@ -16,4 +16,6 @@ export const EnvironmentSchema = zod.object({
 
   REDIS_HOST: zod.string(),
   REDIS_PORT: zod.coerce.number(),
+
+  APP_API_KEY: zod.string(),
 });
