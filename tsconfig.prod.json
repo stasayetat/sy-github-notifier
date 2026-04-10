@@ -10,5 +10,12 @@
       "@shared/*": ["./src/shared/*"]
     }
   },
-  "exclude": [".build", "tests", "vitest.int.config.ts", "vitest.unit.config.ts"]
+  "exclude": [
+    ".build",
+    "tests",
+    "vitest.int.config.ts",
+    "vitest.unit.config.ts",
+    "drizzle.config.ts",
+    "eslint.config.ts"
+  ]
 }
