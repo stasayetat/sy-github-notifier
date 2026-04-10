@@ -10,6 +10,12 @@ const config = defineConfig({
     env: {
       DOTENV_CONFIG_PATH: 'profiles/.env.test',
     },
+    coverage: {
+      provider: 'v8',
+      reporter: ['json-summary', 'json'],
+      reportOnFailure: true,
+      include: ['src/**/*.ts'],
+    },
   },
   resolve: {
     alias: {
