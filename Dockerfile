@@ -15,6 +15,7 @@ COPY package.json pnpm-lock.yaml .npmrc ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
+COPY profiles profiles
 
 RUN pnpm run build
 
