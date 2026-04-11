@@ -6,8 +6,9 @@ import { logger } from '@shared/logger';
 import { ApiResponse, GetSubscriptionsResponse } from '@shared/types';
 import path from 'path';
 
+import { authInterceptor } from './interceptors/auth.interceptor';
+import { validateGrpc } from './interceptors/validate-grpc';
 import { ProtoGrpcType } from './proto-types/subscription';
-import { validateGrpc } from './validate-grpc';
 
 const PROTO_PATH = path.resolve(__dirname, './subscription.proto');
 
@@ -75,7 +76,9 @@ async function getSubscriptions(
 }
 
 export function startGrpcServer(port: number) {
-  const server = new grpc.Server();
+  const server = new grpc.Server({
+    interceptors: [authInterceptor],
+  });
 
   server.addService(proto.subscription.SubscriptionService.service, {
     subscribe: (call: grpc.ServerUnaryCall<SubscribeDto, ApiResponse>, callback: grpc.sendUnaryData<ApiResponse>) =>
