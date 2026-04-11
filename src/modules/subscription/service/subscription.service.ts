@@ -103,7 +103,11 @@ export class SubscriptionService {
 
     const newSubscription = await this.subscriptionRepository.createNewSubscription(email, repository.id);
 
-    await this.notificationEmailService.sendConfirmationEmail(email, newSubscription.token, repository.repo);
+    const responseEither = await this.sendConfirmationOrFail(email, newSubscription.token, repository.repo);
+
+    if (E.isLeft(responseEither)) {
+      return responseEither.value;
+    }
 
     subscriptionsTotal.inc({ status: 'sent' });
 
@@ -125,7 +129,11 @@ export class SubscriptionService {
 
     logger.info(`Subscription for ${subscription.repoId} from ${email} already exists but not confirmed`);
 
-    await this.notificationEmailService.sendConfirmationEmail(email, subscription.token, repo);
+    const responseEither = await this.sendConfirmationOrFail(email, subscription.token, repo);
+
+    if (E.isLeft(responseEither)) {
+      return responseEither.value;
+    }
 
     subscriptionsTotal.inc({ status: 'resent' });
 
@@ -156,7 +164,11 @@ export class SubscriptionService {
     totalReposCount.inc();
 
     const newSubscription = await this.subscriptionRepository.createNewSubscription(email, newRepo.id);
-    await this.notificationEmailService.sendConfirmationEmail(email, newSubscription.token, repo);
+    const responseEither = await this.sendConfirmationOrFail(email, newSubscription.token, repo);
+
+    if (E.isLeft(responseEither)) {
+      return responseEither.value;
+    }
 
     logger.info(`Confirmation for ${repo} successfully sent to ${email}`);
 
@@ -173,5 +185,21 @@ export class SubscriptionService {
 
       totalReposCount.dec();
     }
+  }
+
+  private async sendConfirmationOrFail(
+    email: string,
+    token: string,
+    repo: string,
+  ): Promise<E.Either<ApiResponse, null>> {
+    const responseEither = await this.notificationEmailService.sendConfirmationEmail(email, token, repo);
+
+    if (E.isLeft(responseEither)) {
+      subscriptionsTotal.inc({ status: 'failed_to_send_email' });
+
+      return E.left({ status: 500, message: responseEither.value.message });
+    }
+
+    return E.right(null);
   }
 }

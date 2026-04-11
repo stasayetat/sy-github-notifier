@@ -7,23 +7,32 @@ import {
 } from '@shared/email/email.utils';
 import { logger } from '@shared/logger';
 import { emailSentTotal } from '@shared/metrics';
+import { E, FailureResult, SuccessResult } from '@shared/types';
 import { Repository } from '@shared/types/repository.types';
 import { getErrorMessage } from '@shared/utils';
 
 export class NotificationEmailService {
-  async sendConfirmationEmail(to: string, token: string, repo: string) {
+  async sendConfirmationEmail(
+    to: string,
+    token: string,
+    repo: string,
+  ): Promise<E.Either<FailureResult, SuccessResult>> {
     try {
       await EmailApiClient.sendEmail(to, EMAIL_SUBJECT_CONFIRMATION, confirmationEmailTemplate(token, repo));
 
       logger.info(`User ${to} has received confirmation email`);
 
       emailSentTotal.inc({ type: 'confirmation', status: 'success' });
+
+      return E.right({ success: true });
     } catch (error) {
       const message = getErrorMessage(error);
 
       emailSentTotal.inc({ type: 'confirmation', status: 'failed' });
 
       logger.error(`Failed to send confirmation ${to}: ${message}`);
+
+      return E.left({ success: false, message });
     }
   }
 
