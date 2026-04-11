@@ -28,6 +28,8 @@ pnpm run dev
 
 All endpoints require `x-api-key` header except `/confirm` and `/unsubscribe`.
 
+Full API documentation available at **http://localhost:3000/docs** (Swagger UI).
+
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/` | Health check |
