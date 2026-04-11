@@ -78,7 +78,7 @@ export class ScannerService {
   private async notifySubscribers({ subscribers, newTag, repo }: RepoNotifyInfo) {
     await Promise.all(
       subscribers.map(subscriber =>
-        this.notifierService.sendReleaseNotification(subscriber.email, repo.repo, newTag, subscriber.token),
+        this.notifierService.sendReleaseNotification(subscriber.email, repo, newTag, subscriber.token),
       ),
     );
 

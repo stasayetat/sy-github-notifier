@@ -7,6 +7,7 @@ import {
 import { emailApiClient } from '@shared/email/index';
 import { logger } from '@shared/logger';
 import { emailSentTotal } from '@shared/metrics';
+import { Repository } from '@shared/types/repository.types';
 import { getErrorMessage } from '@shared/utils';
 
 export class NotificationEmailService {
@@ -26,15 +27,15 @@ export class NotificationEmailService {
     }
   }
 
-  async sendReleaseNotification(to: string, repo: string, tag: string, unsubscribeToken: string) {
+  async sendReleaseNotification(to: string, repo: Repository, tag: string, unsubscribeToken: string) {
     try {
       await emailApiClient.sendEmail(
         to,
-        EMAIL_SUBJECT_RELEASE_NOTIFICATION(repo, tag),
+        EMAIL_SUBJECT_RELEASE_NOTIFICATION(repo.repo, tag),
         releaseNotificationTemplate(repo, tag, unsubscribeToken),
       );
 
-      logger.info(`User ${to} has received release notification about ${repo}`);
+      logger.info(`User ${to} has received release notification about ${repo.repo}`);
 
       emailSentTotal.inc({ type: 'release', status: 'success' });
     } catch (error) {

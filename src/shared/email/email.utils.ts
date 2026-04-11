@@ -1,4 +1,5 @@
 import { env } from '@shared/env';
+import { Repository } from '@shared/types/repository.types';
 
 export const EMAIL_SUBJECT_CONFIRMATION = 'Confirm your subscription';
 
@@ -26,21 +27,25 @@ export const confirmationEmailTemplate = (token: string, repo: string) => `
   </html>
 `;
 
-export const releaseNotificationTemplate = (repo: string, tag: string, unsubscribeToken: string) => `
+export const releaseNotificationTemplate = (repo: Repository, tag: string, unsubscribeToken: string) => `
   <!DOCTYPE html>
   <html>
     <body>
       <div>
         <h2 style="margin: 0 0 8px; color: #24292f;">New release published</h2>
         <p style="color: #57606a; margin: 0 0 4px;">Repository</p>
-        <p style="margin: 0 0 16px; font-weight: 600; color: #24292f;">${repo}</p>
+        <p style="margin: 0 0 16px; font-weight: 600; color: #24292f;">${repo.repo}</p>
         <p style="color: #57606a; margin: 0 0 4px;">Version</p>
         <p style="margin: 0 0 24px;">
-          <span style="background: #dafbe1; color: #1a7f37; padding: 2px 10px">
+          <span style="background: #fff8c5; color: #9a6700; padding: 2px 10px; border-radius: 4px; font-family: monospace;">
+            ${repo.last_seen_tag}
+          </span>
+          <span style="color: #57606a; margin: 0 6px;">→</span>
+          <span style="background: #dafbe1; color: #1a7f37; padding: 2px 10px; border-radius: 4px; font-family: monospace;">
             ${tag}
           </span>
         </p>
-        <a href="https://github.com/${repo}/releases/tag/${tag}"
+        <a href="https://github.com/${repo.repo}/releases/tag/${tag}"
            style="display: inline-block; background: #24292f; color: #fff; text-decoration: none;
                   padding: 10px 20px; border-radius: 6px">
           View release on GitHub
