@@ -64,3 +64,7 @@ On every push to `master`, the subscription form in `docs/index.html` is deploye
 You can test the subscription form at **https://stasayetat.github.io/sy-github-notifier/**
 
 The API runs on Railway’s free plan, so it might be asleep or unavailable. If the form doesn’t respond, the service may be paused.
+
+## Email
+
+In production, emails are sent via [Brevo](https://www.brevo.com/) SMTP. In local development, emails are captured by [Mailpit](http://localhost:8025) — no real emails are sent.
