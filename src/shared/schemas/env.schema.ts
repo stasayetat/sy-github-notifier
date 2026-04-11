@@ -13,6 +13,7 @@ export const EnvironmentSchema = zod.object({
   SMTP_PORT: zod.coerce.number(),
   SMTP_USER: zod.string(),
   SMTP_PASS: zod.string(),
+  SMTP_SENDER_EMAIL: zod.string(),
 
   REDIS_URL: zod.string(),
 

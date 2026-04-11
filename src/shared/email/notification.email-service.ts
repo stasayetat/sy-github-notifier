@@ -1,10 +1,10 @@
+import { EmailApiClient } from '@shared/apis';
 import {
   confirmationEmailTemplate,
   EMAIL_SUBJECT_CONFIRMATION,
   EMAIL_SUBJECT_RELEASE_NOTIFICATION,
   releaseNotificationTemplate,
 } from '@shared/email/email.utils';
-import { emailApiClient } from '@shared/email/index';
 import { logger } from '@shared/logger';
 import { emailSentTotal } from '@shared/metrics';
 import { Repository } from '@shared/types/repository.types';
@@ -13,7 +13,7 @@ import { getErrorMessage } from '@shared/utils';
 export class NotificationEmailService {
   async sendConfirmationEmail(to: string, token: string, repo: string) {
     try {
-      await emailApiClient.sendEmail(to, EMAIL_SUBJECT_CONFIRMATION, confirmationEmailTemplate(token, repo));
+      await EmailApiClient.sendEmail(to, EMAIL_SUBJECT_CONFIRMATION, confirmationEmailTemplate(token, repo));
 
       logger.info(`User ${to} has received confirmation email`);
 
@@ -29,7 +29,7 @@ export class NotificationEmailService {
 
   async sendReleaseNotification(to: string, repo: Repository, tag: string, unsubscribeToken: string) {
     try {
-      await emailApiClient.sendEmail(
+      await EmailApiClient.sendEmail(
         to,
         EMAIL_SUBJECT_RELEASE_NOTIFICATION(repo.repo, tag),
         releaseNotificationTemplate(repo, tag, unsubscribeToken),

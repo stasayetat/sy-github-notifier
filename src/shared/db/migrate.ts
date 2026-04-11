@@ -5,7 +5,9 @@ import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 
 void (async () => {
-  const client = postgres(env.POSTGRES_URL);
+  const client = postgres(env.POSTGRES_URL, {
+    onnotice: () => {},
+  });
   const db = drizzle(client);
 
   await migrate(db, { migrationsFolder: './migrations' });
