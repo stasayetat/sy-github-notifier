@@ -81,7 +81,7 @@ describe('ScannerService (integration)', () => {
 
       expect(mockNotifierService.sendReleaseNotification).toHaveBeenCalledWith(
         'test@gmail.com',
-        'facebook/react',
+        repo,
         'v2.0.0',
         expect.any(String),
       );
@@ -119,7 +119,7 @@ describe('ScannerService (integration)', () => {
       expect(mockNotifierService.sendReleaseNotification).toHaveBeenCalledTimes(1);
       expect(mockNotifierService.sendReleaseNotification).toHaveBeenCalledWith(
         'test@gmail.com',
-        'microsoft/typescript',
+        repo2,
         'v5.0.0',
         expect.any(String),
       );

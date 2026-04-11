@@ -93,7 +93,7 @@ describe('ScannerService', () => {
 
       expect(notifierService.sendReleaseNotification).toHaveBeenCalledWith(
         'test@gmail.com',
-        'owner/repo',
+        mockRepo,
         'v2.0.0',
         'token-uuid',
       );
@@ -131,8 +131,8 @@ describe('ScannerService', () => {
       await service.run();
 
       expect(notifierService.sendReleaseNotification).toHaveBeenCalledTimes(2);
-      expect(notifierService.sendReleaseNotification).toHaveBeenCalledWith('test@gmail.com', 'owner/repo', 'v2.0.0', 'token-uuid');
-      expect(notifierService.sendReleaseNotification).toHaveBeenCalledWith('test2@gmail.com', 'owner/repo', 'v2.0.0', 'token-uuid-2');
+      expect(notifierService.sendReleaseNotification).toHaveBeenCalledWith('test@gmail.com', mockRepo, 'v2.0.0', 'token-uuid');
+      expect(notifierService.sendReleaseNotification).toHaveBeenCalledWith('test2@gmail.com', mockRepo, 'v2.0.0', 'token-uuid-2');
     });
   });
 });

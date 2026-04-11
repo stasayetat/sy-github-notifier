@@ -6,12 +6,14 @@ import { NotificationEmailService } from '@shared/email/notification.email-servi
 import { E } from '@shared/types';
 import { beforeEach, describe, expect, it, MockedObject, vi } from 'vitest';
 
-vi.mock('@shared/email', () => ({
-  emailService: {
-    sendConfirmationEmail: vi.fn(),
-    sendReleaseNotification: vi.fn(),
-  },
-}));
+vi.mock('@shared/email', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@shared/email')>();
+
+  return {
+    ...actual,
+    NotificationEmailService: class {},
+  };
+});
 
 vi.mock('@shared/apis/github.api-client', () => ({
   GithubApiClient: {
