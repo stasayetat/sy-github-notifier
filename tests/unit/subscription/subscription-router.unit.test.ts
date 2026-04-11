@@ -1,4 +1,5 @@
 import { subscriptionRouter } from '@modules/subscription';
+import { env } from '@shared/env';
 import express from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
@@ -7,13 +8,7 @@ const app = express();
 app.use(express.json());
 app.use('/api', subscriptionRouter);
 
-beforeAll(() => {
-  process.env.API_KEY = 'test-key';
-});
-
-const authed = (req: request.Test) => req.set('x-api-key', 'test-key');
-
-
+const authed = (req: request.Test) => req.set('x-api-key', env.APP_API_KEY);
 
 describe('POST /api/subscribe', () => {
   it('should return 400 for invalid email', async () => {
