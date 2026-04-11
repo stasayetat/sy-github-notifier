@@ -35,6 +35,10 @@ All endpoints require `x-api-key` header except `/confirm` and `/unsubscribe`.
 
 Full API documentation available at **http://localhost:3000/docs** (Swagger UI).
 
+The following endpoints require `x-api-key` header:
+- `POST /api/subscribe`
+- `GET /api/subscriptions`
+
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/` | Health check |
@@ -47,6 +51,8 @@ Full API documentation available at **http://localhost:3000/docs** (Swagger UI).
 ## gRPC
 
 Same operations available on port `50051`. Proto file: `src/grpc/subscription.proto`.
+
+`Subscribe` and `GetSubscriptions` methods require `x-api-key` metadata header
 
 ## Tests
 
