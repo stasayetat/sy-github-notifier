@@ -1,6 +1,5 @@
+import { hasNewRelease } from '@modules/scanner';
 import { describe, expect, it } from 'vitest';
-
-import { hasNewRelease } from '../../../src/modules/scanner/scanner.utils';
 
 const mockRepo = {
   id: 'repo-uuid',
@@ -9,13 +8,11 @@ const mockRepo = {
   checkedAt: new Date(),
 };
 
-const mockRelease = { tag_name: 'v1.0.0', id: 1, name: 'v1.0.0', url: '', body: '', created_at: new Date(), published_at: new Date(), author: { login: '', avatar_url: '' } };
-
 describe('hasNewRelease', () => {
   it('should return true when tags differ', () => {
     const result = hasNewRelease({
       currentRepo: mockRepo,
-      fetchedRepo: { ...mockRelease, tag_name: 'v2.0.0' },
+      latestTag: 'v2.0.0',
     });
 
     expect(result).toBe(true);
@@ -24,7 +21,7 @@ describe('hasNewRelease', () => {
   it('should return false when tags are the same', () => {
     const result = hasNewRelease({
       currentRepo: mockRepo,
-      fetchedRepo: { ...mockRelease, tag_name: 'v1.0.0' },
+      latestTag: 'v1.0.0',
     });
 
     expect(result).toBe(false);

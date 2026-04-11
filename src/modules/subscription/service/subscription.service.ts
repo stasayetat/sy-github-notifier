@@ -1,7 +1,7 @@
 import { GithubApiClient } from '@shared/apis';
 import { NotificationEmailService } from '@shared/email';
 import { logger } from '@shared/logger';
-import { emailSentTotal, subscriptionsTotal } from '@shared/metrics';
+import { subscriptionsTotal } from '@shared/metrics';
 import { ApiResponse, E, GetSubscriptionsResponse, MinifiedSubscription, Subscription } from '@shared/types';
 import { Repository } from '@shared/types/repository.types';
 
@@ -45,6 +45,8 @@ export class SubscriptionService {
     const foundSubscriptionEither = await this.findSubscriptionByTokenOrFail(token, true);
 
     if (E.isLeft(foundSubscriptionEither)) {
+      subscriptionsTotal.inc({ status: 'token_not_found' });
+
       return foundSubscriptionEither.value;
     }
 
@@ -99,7 +101,7 @@ export class SubscriptionService {
 
     await this.notificationEmailService.sendConfirmationEmail(email, newSubscription.token, repository.repo);
 
-    emailSentTotal.inc({ type: 'confirmation', status: 'success' });
+    subscriptionsTotal.inc({ status: 'sent' });
 
     return { status: 200, message: 'Confirmation email sent' };
   }
@@ -127,17 +129,17 @@ export class SubscriptionService {
   }
 
   private async subscribeToNewRepo(email: string, repo: string) {
-    const foundRepoEither = await GithubApiClient.getLatestRelease(repo);
+    const tagsResponseEither = await GithubApiClient.getTags(repo);
 
-    if (E.isLeft(foundRepoEither)) {
-      logger.info(`Something went wrong. Message: ${foundRepoEither.value.message}`);
+    if (E.isLeft(tagsResponseEither)) {
+      logger.info(`Something went wrong. Message: ${JSON.stringify(tagsResponseEither.value.message)}`);
 
       subscriptionsTotal.inc({ status: 'repo_not_found' });
 
-      return foundRepoEither.value;
+      return tagsResponseEither.value;
     }
 
-    const newRepo = await this.repoRepository.createRepo(repo, foundRepoEither.value.tag_name);
+    const newRepo = await this.repoRepository.createRepo(repo, tagsResponseEither.value[0].name);
 
     const newSubscription = await this.subscriptionRepository.createNewSubscription(email, newRepo.id);
     await this.notificationEmailService.sendConfirmationEmail(email, newSubscription.token, repo);

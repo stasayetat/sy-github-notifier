@@ -1,6 +1,6 @@
-import { LatestReleaseResponseSchema, RepositoryResponseSchema } from '@shared/schemas';
+import { RepositoryResponseSchema, TagsResponseSchema } from '@shared/schemas';
 import zod from 'zod';
 
-export type LatestReleaseResponse = zod.infer<typeof LatestReleaseResponseSchema>;
+export type TagsResponse = zod.infer<typeof TagsResponseSchema>;
 
 export type RepositoryResponse = zod.infer<typeof RepositoryResponseSchema>;

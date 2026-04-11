@@ -7,13 +7,13 @@ export class SubscriptionRepository {
   async createNewSubscription(email: string, repoId: string) {
     const [newSubscription] = await db.insert(subscriptions).values({ email, repoId }).returning();
 
-    activeSubscriptionCount.inc();
-
     return newSubscription;
   }
 
   async confirmSubscription(subscription: Subscription) {
     await db.update(subscriptions).set({ confirmed: true }).where(eq(subscriptions.id, subscription.id));
+
+    activeSubscriptionCount.inc();
   }
 
   async removeSubscription(subscription: Subscription) {

@@ -14,7 +14,7 @@ export class NotificationEmailService {
     try {
       await emailApiClient.sendEmail(to, EMAIL_SUBJECT_CONFIRMATION, confirmationEmailTemplate(token, repo));
 
-      logger.info(`User ${to} has recevied confirmation email`);
+      logger.info(`User ${to} has received confirmation email`);
 
       emailSentTotal.inc({ type: 'confirmation', status: 'success' });
     } catch (error) {
@@ -34,7 +34,7 @@ export class NotificationEmailService {
         releaseNotificationTemplate(repo, tag, unsubscribeToken),
       );
 
-      logger.info(`User ${to} has recevied release notification about ${repo}`);
+      logger.info(`User ${to} has received release notification about ${repo}`);
 
       emailSentTotal.inc({ type: 'release', status: 'success' });
     } catch (error) {

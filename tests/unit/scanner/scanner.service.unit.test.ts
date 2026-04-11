@@ -3,12 +3,12 @@ import { RepoRepository } from '@modules/subscription/repository/repo.repository
 import { SubscriptionRepository } from '@modules/subscription/repository/subscription.repository';
 import { GithubApiClient } from '@shared/apis';
 import { NotificationEmailService } from '@shared/email/notification.email-service';
-import { E } from '@shared/types';
+import { E, TagsResponse } from '@shared/types';
 import { beforeEach, describe, expect, it, MockedObject, vi } from 'vitest';
 
 vi.mock('@shared/apis', () => ({
   GithubApiClient: {
-    getLatestRelease: vi.fn(),
+    getTags: vi.fn(),
   },
 }));
 
@@ -60,8 +60,8 @@ describe('ScannerService', () => {
 
     it('should return early if there are no subscriptions', async () => {
       repoRepository.getAllRepos.mockResolvedValue([mockRepo]);
-      vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(
-        E.right({ data: { tag_name: 'v2.0.0' } } as any),
+      vi.mocked(GithubApiClient.getTags).mockResolvedValue(
+        E.right([{ name: 'v2.0.0' }] as TagsResponse),
       );
       subscriptionRepository.getSubscriptionsByRepoIds.mockResolvedValue([]);
 
@@ -72,8 +72,8 @@ describe('ScannerService', () => {
 
     it('should not notify if tag has not changed', async () => {
       repoRepository.getAllRepos.mockResolvedValue([mockRepo]);
-      vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(
-        E.right({ tag_name: 'v1.0.0' } as any),
+      vi.mocked(GithubApiClient.getTags).mockResolvedValue(
+        E.right([{ name: 'v1.0.0' }] as TagsResponse),
       );
 
       await service.run();
@@ -84,8 +84,8 @@ describe('ScannerService', () => {
 
     it('should notify subscribers and update tag when new release found', async () => {
       repoRepository.getAllRepos.mockResolvedValue([mockRepo]);
-      vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(
-        E.right({ tag_name: 'v2.0.0' } as any),
+      vi.mocked(GithubApiClient.getTags).mockResolvedValue(
+        E.right([{ name: 'v2.0.0' }] as TagsResponse),
       );
       subscriptionRepository.getSubscriptionsByRepoIds.mockResolvedValue([mockSubscription]);
 
@@ -104,9 +104,9 @@ describe('ScannerService', () => {
       const mockRepo2 = { ...mockRepo, id: 'repo-uuid-2', repo: 'owner/repo2' };
 
       repoRepository.getAllRepos.mockResolvedValue([mockRepo, mockRepo2]);
-      vi.mocked(GithubApiClient.getLatestRelease)
+      vi.mocked(GithubApiClient.getTags)
         .mockResolvedValueOnce(E.left({ status: 500, message: 'Error' }))
-        .mockResolvedValueOnce(E.right({ tag_name: 'v2.0.0' } as any));
+        .mockResolvedValueOnce(E.right([{ name: 'v2.0.0' }] as TagsResponse));
 
       subscriptionRepository.getSubscriptionsByRepoIds.mockResolvedValue([
         { ...mockSubscription, repoId: 'repo-uuid-2' },
@@ -120,8 +120,8 @@ describe('ScannerService', () => {
 
     it('should notify multiple subscribers for the same repo', async () => {
       repoRepository.getAllRepos.mockResolvedValue([mockRepo]);
-      vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(
-        E.right({ tag_name: 'v2.0.0' } as any),
+      vi.mocked(GithubApiClient.getTags).mockResolvedValue(
+        E.right([{ name: 'v2.0.0' }] as TagsResponse),
       );
       subscriptionRepository.getSubscriptionsByRepoIds.mockResolvedValue([
         mockSubscription,

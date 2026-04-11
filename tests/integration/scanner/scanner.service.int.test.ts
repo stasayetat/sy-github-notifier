@@ -1,16 +1,15 @@
+import { ScannerService } from '@modules/scanner';
 import { RepoRepository } from '@modules/subscription/repository/repo.repository';
 import { SubscriptionRepository } from '@modules/subscription/repository/subscription.repository';
 import { GithubApiClient } from '@shared/apis/github.api-client';
 import { db, repos, subscriptions } from '@shared/db';
-import { E } from '@shared/types';
+import { E, TagsResponse } from '@shared/types';
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ScannerService } from '../../../src/modules/scanner/service/scanner.service';
-
 vi.mock('@shared/apis/github.api-client', () => ({
   GithubApiClient: {
-    getLatestRelease: vi.fn(),
+    getTags: vi.fn(),
   },
 }));
 
@@ -58,8 +57,8 @@ describe('ScannerService (integration)', () => {
       const repo = await seedRepo('facebook/react', 'v1.0.0');
       await seedConfirmedSubscription('test@gmail.com', repo.id);
 
-      vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(
-        E.right({ tag_name: 'v1.0.0' } as any),
+      vi.mocked(GithubApiClient.getTags).mockResolvedValue(
+        E.right([{ name: 'v1.0.0' }] as TagsResponse),
       );
 
       await service.run();
@@ -74,8 +73,8 @@ describe('ScannerService (integration)', () => {
       const repo = await seedRepo('facebook/react', 'v1.0.0');
       await seedConfirmedSubscription('test@gmail.com', repo.id);
 
-      vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(
-        E.right({ tag_name: 'v2.0.0' } as any),
+      vi.mocked(GithubApiClient.getTags).mockResolvedValue(
+        E.right([{ name: 'v2.0.0' }] as TagsResponse),
       );
 
       await service.run();
@@ -96,8 +95,8 @@ describe('ScannerService (integration)', () => {
       await seedConfirmedSubscription('user1@gmail.com', repo.id);
       await seedConfirmedSubscription('user2@gmail.com', repo.id);
 
-      vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(
-        E.right({ tag_name: 'v2.0.0' } as any),
+      vi.mocked(GithubApiClient.getTags).mockResolvedValue(
+        E.right([{ name: 'v2.0.0' }] as TagsResponse),
       );
 
       await service.run();
@@ -111,9 +110,9 @@ describe('ScannerService (integration)', () => {
       await seedConfirmedSubscription('test@gmail.com', repo1.id);
       await seedConfirmedSubscription('test@gmail.com', repo2.id);
 
-      vi.mocked(GithubApiClient.getLatestRelease)
+      vi.mocked(GithubApiClient.getTags)
         .mockResolvedValueOnce(E.left({ status: 500, message: 'Error' }))
-        .mockResolvedValueOnce(E.right({ tag_name: 'v5.0.0' } as any));
+        .mockResolvedValueOnce(E.right([{ name: 'v5.0.0' }] as TagsResponse));
 
       await service.run();
 
@@ -133,8 +132,8 @@ describe('ScannerService (integration)', () => {
       const repo = await seedRepo('facebook/react', 'v1.0.0');
       await db.insert(subscriptions).values({ email: 'test@gmail.com', repoId: repo.id, confirmed: false });
 
-      vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(
-        E.right({ tag_name: 'v2.0.0' } as any),
+      vi.mocked(GithubApiClient.getTags).mockResolvedValue(
+        E.right([{ name: 'v2.0.0' }] as TagsResponse),
       );
 
       await service.run();

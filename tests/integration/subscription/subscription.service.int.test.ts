@@ -3,12 +3,12 @@ import { SubscriptionRepository } from '@modules/subscription/repository/subscri
 import { SubscriptionService } from '@modules/subscription/service/subscription.service';
 import { GithubApiClient } from '@shared/apis/github.api-client';
 import { db, repos, subscriptions } from '@shared/db';
-import { E } from '@shared/types';
+import { E, TagsResponse } from '@shared/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@shared/apis/github.api-client', () => ({
   GithubApiClient: {
-    getLatestRelease: vi.fn(),
+    getTags: vi.fn(),
   },
 }));
 
@@ -21,8 +21,8 @@ describe('SubscriptionService (integration)', () => {
     await db.delete(subscriptions);
     await db.delete(repos);
 
-    vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(
-      E.right({ tag_name: 'v1.0.0' } as any),
+    vi.mocked(GithubApiClient.getTags).mockResolvedValue(
+      E.right([{ name: 'v1.0.0' } ] as TagsResponse),
     );
 
     const mockEmailService = {
@@ -87,7 +87,7 @@ describe('SubscriptionService (integration)', () => {
     });
 
     it('should return 404 if github repo has no releases', async () => {
-      vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(
+      vi.mocked(GithubApiClient.getTags).mockResolvedValue(
         E.left({ status: 404, message: 'Not found' }),
       );
 

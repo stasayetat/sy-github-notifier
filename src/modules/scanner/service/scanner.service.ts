@@ -94,21 +94,21 @@ export class ScannerService {
       subscriptionsByRepoId.set(subscription.repoId, existingSubscription);
     }
 
-    return repoToNotify.map(({ currentRepo, fetchedRepo }) => ({
-      newTag: fetchedRepo.tag_name,
+    return repoToNotify.map(({ currentRepo, latestTag }) => ({
+      newTag: latestTag,
       repo: currentRepo,
       subscribers: subscriptionsByRepoId.get(currentRepo.id) ?? [],
     }));
   }
 
   private async scanAllRepos(allRepos: Repository[]) {
-    const results = await Promise.all(
+    const resultEithers = await Promise.all(
       allRepos.map(repo => {
-        return this.scannerLimiter.schedule(() => this.fetchLatestReleaseInfo(repo));
+        return this.scannerLimiter.schedule(() => this.fetchTagsInfo(repo));
       }),
     );
 
-    const { successful, failed } = results.reduce<{
+    const { successful, failed } = resultEithers.reduce<{
       successful: RepoScanSuccess[];
       failed: RepoScanError[];
     }>(
@@ -131,19 +131,19 @@ export class ScannerService {
     return successful;
   }
 
-  private async fetchLatestReleaseInfo(repo: Repository): Promise<E.Either<RepoScanError, RepoScanSuccess>> {
-    const result = await GithubApiClient.getLatestRelease(repo.repo);
+  private async fetchTagsInfo(repo: Repository): Promise<E.Either<RepoScanError, RepoScanSuccess>> {
+    const tagsResponseEither = await GithubApiClient.getTags(repo.repo);
 
-    if (E.isLeft(result)) {
+    if (E.isLeft(tagsResponseEither)) {
       return E.left({
         currentRepo: repo,
-        error: result.value,
+        error: tagsResponseEither.value,
       });
     }
 
     return E.right({
       currentRepo: repo,
-      fetchedRepo: result.value,
+      latestTag: tagsResponseEither.value[0].name,
     });
   }
 }

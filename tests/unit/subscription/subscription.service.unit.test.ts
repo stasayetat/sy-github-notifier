@@ -1,11 +1,10 @@
+import { SubscriptionService } from '@modules/subscription';
 import { RepoRepository } from '@modules/subscription/repository/repo.repository';
 import { SubscriptionRepository } from '@modules/subscription/repository/subscription.repository';
 import { GithubApiClient } from '@shared/apis/github.api-client';
 import { NotificationEmailService } from '@shared/email/notification.email-service';
 import { E } from '@shared/types';
 import { beforeEach, describe, expect, it, MockedObject, vi } from 'vitest';
-
-import { SubscriptionService } from '../../../src/modules/subscription/service/subscription.service';
 
 vi.mock('@shared/email', () => ({
   emailService: {
@@ -16,7 +15,7 @@ vi.mock('@shared/email', () => ({
 
 vi.mock('@shared/apis/github.api-client', () => ({
   GithubApiClient: {
-    getLatestRelease: vi.fn(),
+    getTags: vi.fn(),
   },
 }));
 
@@ -36,7 +35,7 @@ const mockSubscription = {
   createdAt: new Date(),
 };
 
-const mockRelease = { tag_name: 'v1.0.0' };
+const mockTagsResponse = [{ name: 'v1.0.0' }];
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
@@ -94,7 +93,7 @@ describe('SubscriptionService', () => {
 
     it('should return 404 if github repo has no releases', async () => {
       repoRepository.findByRepo.mockResolvedValue(null);
-      vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(E.left({ status: 404, message: 'Not found' }));
+      vi.mocked(GithubApiClient.getTags).mockResolvedValue(E.left({ status: 404, message: 'Not found' }));
 
       const result = await service.subscribe('test@gmail.com', 'owner/repo');
 
@@ -104,7 +103,7 @@ describe('SubscriptionService', () => {
 
     it('should create new repo and subscription and send confirmation email', async () => {
       repoRepository.findByRepo.mockResolvedValue(null);
-      vi.mocked(GithubApiClient.getLatestRelease).mockResolvedValue(E.right(mockRelease as any));
+      vi.mocked(GithubApiClient.getTags).mockResolvedValue(E.right(mockTagsResponse as any));
       repoRepository.createRepo.mockResolvedValue(mockRepo);
       subscriptionRepository.createNewSubscription.mockResolvedValue(mockSubscription);
 
@@ -112,7 +111,7 @@ describe('SubscriptionService', () => {
 
       expect(result.status).toBe(200);
       expect(result.message).toBe('Confirmation email sent');
-      expect(repoRepository.createRepo).toHaveBeenCalledWith('owner/repo', mockRelease.tag_name);
+      expect(repoRepository.createRepo).toHaveBeenCalledWith('owner/repo', mockTagsResponse[0].name);
       expect(subscriptionRepository.createNewSubscription).toHaveBeenCalledWith('test@gmail.com', mockRepo.id);
       expect(notificationEmailService.sendConfirmationEmail).toHaveBeenCalledWith('test@gmail.com', mockSubscription.token, 'owner/repo');
     });

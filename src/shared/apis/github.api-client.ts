@@ -2,7 +2,7 @@ import { env } from '@shared/env';
 import { logger } from '@shared/logger';
 import { githubApiDuration, githubApiRequestsTotal } from '@shared/metrics/github.metrics';
 import { getOrSet } from '@shared/redis';
-import { ApiResponse, E, LatestReleaseResponse } from '@shared/types';
+import { ApiResponse, E, TagsResponse } from '@shared/types';
 import { getErrorMessage } from '@shared/utils';
 import { resolveRetryAfterMs } from '@shared/utils/github.utils';
 import axios, { AxiosRequestConfig } from 'axios';
@@ -20,11 +20,11 @@ export namespace GithubApiClient {
     },
   };
 
-  export const getLatestRelease = (repo: string): Promise<E.Either<ApiResponse, LatestReleaseResponse>> => {
+  export const getTags = (repo: string): Promise<E.Either<ApiResponse, TagsResponse>> => {
     return getOrSet(
-      `github:release:${repo}`,
+      `github:tags:${repo}`,
       ms('10 minutes'),
-      () => getSimple<LatestReleaseResponse>(`/repos/${repo}/releases/latest`),
+      () => getSimple<TagsResponse>(`/repos/${repo}/tags`),
       either => E.isRight(either),
     );
   };
@@ -52,7 +52,7 @@ export namespace GithubApiClient {
         githubApiRequestsTotal.inc({ status: 'failed' });
         end({ status: 'rate_limited' });
 
-        return E.left({ status: response.status, message: String(response.data) });
+        return E.left({ status: response.status, message: JSON.stringify(response.data) });
       }
 
       githubApiRequestsTotal.inc({ status: 'success' });
