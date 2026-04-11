@@ -34,4 +34,4 @@ COPY --from=builder /opt/app/src/grpc/subscription.proto .build/grpc/subscriptio
 
 USER node
 
-CMD ["node", ".build/main.js"]
+CMD ["sh", "-c", "node .build/shared/db/migrate.js && node .build/main.js"]
