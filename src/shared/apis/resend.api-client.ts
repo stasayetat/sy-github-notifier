@@ -16,7 +16,7 @@ export class ResendApiClient implements EmailApiClient {
     try {
       await this.limiter.schedule(() => {
         return this.resend.emails.send({
-          from: 'onboarding@resend.dev',
+          from: 'onboarding@sy.notifier.com',
           to: recipientEmail,
           subject,
           html: htmlText,
