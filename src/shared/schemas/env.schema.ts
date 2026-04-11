@@ -15,8 +15,7 @@ export const EnvironmentSchema = zod.object({
   SMTP_USER: zod.string(),
   SMTP_PASS: zod.string(),
 
-  REDIS_HOST: zod.string(),
-  REDIS_PORT: zod.coerce.number(),
+  REDIS_URL: zod.string(),
 
   APP_API_KEY: zod.string(),
 

@@ -12,15 +12,13 @@ FROM base AS builder
 
 COPY package.json pnpm-lock.yaml .npmrc ./
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
 RUN pnpm run build
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --prod --frozen-lockfile --ignore-scripts
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # *** PRODUCTION **************************************************************
 FROM node:22-slim AS production
