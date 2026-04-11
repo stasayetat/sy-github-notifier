@@ -79,3 +79,17 @@ The API runs on Railway’s free plan, so it might be asleep or unavailable. If 
 ## Email
 
 In production, emails are sent via [Resend](https://resend.com) HTTP API. Free-tier hosting platform Railway block outbound SMTP ports, so the Resend SDK is used directly instead of SMTP. In local development, emails are captured by [Mailpit](http://localhost:8025) via nodemailer — no real emails are sent.
+
+## Metrics
+
+Prometheus metrics available at `GET /metrics`.
+
+| Metric | Type | Description |
+|---|---|---|
+| `subscriptions_total` | Counter | Subscription attempts by status (`created`, `resent`, `already_exists`, `unsubscribed`, `repo_not_found`, `failed_to_send_email`) |
+| `active_subscriptions_count` | Gauge | Current number of confirmed subscriptions |
+| `total_repos_count` | Gauge | Current number of tracked repositories |
+| `emails_sent_total` | Counter | Emails sent by type (`confirmation`, `release`) and status (`success`, `failed`) |
+| `github_api_requests_total` | Counter | GitHub API calls by status (`success`, `rate_limited`, `error`) |
+| `github_api_request_duration_seconds` | Histogram | GitHub API response time |
+| `scanner_run_duration_seconds` | Histogram | Full scanner job duration |
