@@ -40,7 +40,8 @@ services:
       - ./profiles/.env.production
     environment:
       NODE_ENV: production
-      REDIS_URL: redis://localhost:6379
+      POSTGRES_URL: postgresql://postgres:postgrespassword@postgres:5432/github_notifier
+      REDIS_URL: redis://redis:6379
     ports:
       - "8081:8081"
     command: sh -c "node .build/shared/db/migrate.js && node .build/main.js"

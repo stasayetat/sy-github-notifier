@@ -16,7 +16,11 @@
     "db:studio": "drizzle-kit studio",
     "migrate": "node .build/shared/db/migrate.js",
     "prepare": "husky",
-    "proto:gen": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=src/grpc/proto-types src/grpc/subscription.proto"
+    "proto:gen": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=src/grpc/proto-types src/grpc/subscription.proto",
+    "expose:env": "NODE_ENV=${NODE_ENV:-test} dotenv-flow -p profiles",
+    "docker-compose": "pnpm expose:env -- docker compose",
+    "docker:up:local": "pnpm run docker-compose --profile local up -d",
+    "docker:down": "pnpm run docker-compose --profile local down"
   },
   "engines": {
     "node": "22",
@@ -44,7 +48,9 @@
     "postgres": "^3.4.9",
     "prom-client": "^15.1.3",
     "reflect-metadata": "^0.2.2",
+    "swagger-ui-express": "^5.0.1",
     "winston": "^3.19.0",
+    "yamljs": "^0.3.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -69,10 +75,13 @@
     "@types/nodemailer": "^8.0.0",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.0",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/yamljs": "^0.2.34",
     "@vitest/coverage-v8": "^4.1.4",
     "browser-sync": "^3.0.4",
     "concurrently": "^9.2.1",
     "delay-cli": "^3.0.0",
+    "dotenv-flow-cli": "^1.1.1",
     "drizzle-kit": "^0.31.10",
     "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",

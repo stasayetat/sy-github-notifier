@@ -31,6 +31,7 @@ COPY --from=builder /opt/app/.build .build
 COPY --from=builder /opt/app/migrations migrations
 COPY --from=builder /opt/app/tsconfig.json tsconfig.json
 COPY --from=builder /opt/app/src/grpc/subscription.proto .build/grpc/subscription.proto
+COPY --from=builder /opt/app/swagger.yaml swagger.yaml
 
 USER node
 
