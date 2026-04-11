@@ -4,6 +4,7 @@ import { logger } from '@shared/logger';
 import { scannerRunDuration } from '@shared/metrics';
 import { E, Subscription } from '@shared/types';
 import { Repository } from '@shared/types/repository.types';
+import { getErrorMessage } from '@shared/utils';
 import Bottleneck from 'bottleneck';
 import ms from 'ms';
 
@@ -70,6 +71,10 @@ export class ScannerService {
       await Promise.all(notifyInfos.map(info => this.notifySubscribers(info)));
 
       logger.info(`Scanning successfully end`);
+    } catch (error) {
+      const message = getErrorMessage(error);
+
+      logger.error(`Something went wrong while scanning repos: ${message}`);
     } finally {
       end();
     }
