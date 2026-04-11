@@ -15,7 +15,7 @@ export async function getOrSet<T>(
   const result = await fn();
 
   if (shouldCache(result)) {
-    await redis.set(key, JSON.stringify(result), 'EX', ttlSeconds);
+    await redis.set(key, JSON.stringify(result), 'PX', ttlSeconds);
   }
 
   return result;
