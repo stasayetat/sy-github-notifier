@@ -10,17 +10,14 @@ export namespace EmailApiClient {
     minTime: 1000 / 3,
   });
 
-  const config = {
+  const transporter = nodemailer.createTransport({
     host: env.SMTP_HOST,
     port: env.SMTP_PORT,
     auth: {
       user: env.SMTP_USER,
       pass: env.SMTP_PASS,
     },
-  };
-
-  logger.info(`Config: ${JSON.stringify(config, null, 2)}`);
-  const transporter = nodemailer.createTransport(config);
+  });
 
   export const sendEmail = async (recipientEmail: string, subject: string, htmlText: string) => {
     try {

@@ -26,7 +26,7 @@ describe('SubscriptionService (integration)', () => {
     );
 
     const mockEmailService = {
-      sendConfirmationEmail: vi.fn().mockResolvedValue(undefined),
+      sendConfirmationEmail: vi.fn().mockResolvedValue(E.right({ success: true })),
       sendReleaseNotification: vi.fn().mockResolvedValue(undefined),
     };
 
