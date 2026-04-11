@@ -2,13 +2,13 @@ import { AxiosResponse } from 'axios';
 import ms from 'ms';
 
 export const resolveRetryAfterMs = (response: AxiosResponse): number => {
-  const retryAfter = String(response.headers['retry-after']);
+  const retryAfter = response.headers['retry-after'] as string | undefined;
 
   if (retryAfter) {
     return Number(retryAfter) * 1000;
   }
 
-  const resetAt = String(response.headers['x-ratelimit-reset']);
+  const resetAt = response.headers['x-ratelimit-reset'] as string | undefined;
 
   if (resetAt) {
     return Math.max(0, Number(resetAt) * 1000 - Date.now());

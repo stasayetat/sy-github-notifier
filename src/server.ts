@@ -1,5 +1,6 @@
 import { subscriptionRouter } from '@modules/subscription';
 import { metricsRouter } from '@shared/metrics';
+import { errorHandler } from '@shared/utils';
 import cors from 'cors';
 import express from 'express';
 
@@ -15,3 +16,4 @@ server.get('/', (_req, res) => {
 
 server.use('/api', subscriptionRouter);
 server.use(metricsRouter);
+server.use(errorHandler);

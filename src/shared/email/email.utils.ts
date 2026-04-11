@@ -3,7 +3,7 @@ import { Repository } from '@shared/types/repository.types';
 
 export const EMAIL_SUBJECT_CONFIRMATION = 'Confirm your subscription';
 
-export const EMAIL_SUBJECT_RELEASE_NOTIFICATION = (repo: string, tag: string) => `New release for${repo} - ${tag}`;
+export const EMAIL_SUBJECT_RELEASE_NOTIFICATION = (repo: string, tag: string) => `New release for ${repo} - ${tag}`;
 
 export const confirmationEmailTemplate = (token: string, repo: string) => `
   <!DOCTYPE html>

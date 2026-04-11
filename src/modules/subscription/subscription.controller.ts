@@ -1,11 +1,8 @@
+import { subscriptionService } from '@modules/subscription/index';
 import { ConfirmDto, GetSubscriptionsDto, SubscribeDto, UnsubscribeDto } from '@shared/dtos';
 import { validateBody, validateParams, validateQuery } from '@shared/middlewares';
 import { apiKeyMiddleware } from '@shared/middlewares/api-key.middleware';
 import { Request, Response, Router } from 'express';
-
-import { SubscriptionService } from './service/subscription.service';
-
-const subscriptionService = new SubscriptionService();
 
 export const subscriptionRouter = Router();
 

@@ -1,11 +1,11 @@
 import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
+import { subscriptionService } from '@modules/subscription';
 import { ConfirmDto, GetSubscriptionsDto, SubscribeDto, UnsubscribeDto } from '@shared/dtos';
 import { logger } from '@shared/logger';
 import { ApiResponse, GetSubscriptionsResponse } from '@shared/types';
 import path from 'path';
 
-import { SubscriptionService } from '../modules/subscription/service/subscription.service';
 import { ProtoGrpcType } from './proto-types/subscription';
 import { validateGrpc } from './validate-grpc';
 
@@ -20,8 +20,6 @@ const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
 });
 
 const proto = grpc.loadPackageDefinition(packageDefinition) as unknown as ProtoGrpcType;
-
-const subscriptionService = new SubscriptionService();
 
 async function subscribe(
   call: grpc.ServerUnaryCall<SubscribeDto, ApiResponse>,

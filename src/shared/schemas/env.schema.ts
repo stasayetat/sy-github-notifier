@@ -8,7 +8,6 @@ export const EnvironmentSchema = zod.object({
   APP_URL: zod.string(),
   POSTGRES_URL: zod.string(),
   GITHUB_AUTH_TOKEN: zod.string(),
-  RESEND_AUTH_TOKEN: zod.string(),
   SMTP_HOST: zod.string(),
   SMTP_PORT: zod.coerce.number(),
   SMTP_USER: zod.string(),

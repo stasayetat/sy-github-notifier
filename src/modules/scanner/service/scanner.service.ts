@@ -146,6 +146,13 @@ export class ScannerService {
       });
     }
 
+    if (!tagsResponseEither.value.length) {
+      return E.left({
+        currentRepo: repo,
+        error: { status: 404, message: 'Repository has no tags' },
+      });
+    }
+
     return E.right({
       currentRepo: repo,
       latestTag: tagsResponseEither.value[0].name,

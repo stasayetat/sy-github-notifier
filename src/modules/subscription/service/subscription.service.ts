@@ -1,7 +1,7 @@
 import { GithubApiClient } from '@shared/apis';
 import { NotificationEmailService } from '@shared/email';
 import { logger } from '@shared/logger';
-import { subscriptionsTotal } from '@shared/metrics';
+import { activeSubscriptionCount, subscriptionsTotal, totalReposCount } from '@shared/metrics';
 import { ApiResponse, E, GetSubscriptionsResponse, MinifiedSubscription, Subscription } from '@shared/types';
 import { Repository } from '@shared/types/repository.types';
 
@@ -36,6 +36,8 @@ export class SubscriptionService {
 
     await this.subscriptionRepository.confirmSubscription(foundSubscriptionEither.value);
 
+    activeSubscriptionCount.inc();
+
     logger.info(`Subscription confirmed successfully for ${token}`);
 
     return { status: 200, message: 'Subscription confirmed successfully' };
@@ -51,6 +53,8 @@ export class SubscriptionService {
     }
 
     await this.subscriptionRepository.removeSubscription(foundSubscriptionEither.value);
+    activeSubscriptionCount.dec();
+
     await this.removeRepoIfEmpty(foundSubscriptionEither);
 
     logger.info(`Subscription removed successfully for ${token}`);
@@ -139,7 +143,17 @@ export class SubscriptionService {
       return tagsResponseEither.value;
     }
 
-    const newRepo = await this.repoRepository.createRepo(repo, tagsResponseEither.value[0].name);
+    const tags = tagsResponseEither.value;
+
+    if (!tags.length) {
+      subscriptionsTotal.inc({ status: 'tags_not_found' });
+
+      return { status: 404, message: 'Repository has no tags' };
+    }
+
+    const newRepo = await this.repoRepository.createRepo(repo, tags[0].name);
+
+    totalReposCount.inc();
 
     const newSubscription = await this.subscriptionRepository.createNewSubscription(email, newRepo.id);
     await this.notificationEmailService.sendConfirmationEmail(email, newSubscription.token, repo);
@@ -156,6 +170,8 @@ export class SubscriptionService {
 
     if (!subscriptionsCount) {
       await this.repoRepository.deleteRepo(foundSubscriptionEither.value.repoId);
+
+      totalReposCount.dec();
     }
   }
 }
