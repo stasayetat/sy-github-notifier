@@ -67,4 +67,4 @@ The API runs on Railway’s free plan, so it might be asleep or unavailable. If 
 
 ## Email
 
-In production, emails are sent via [Brevo](https://www.brevo.com/) SMTP. In local development, emails are captured by [Mailpit](http://localhost:8025) — no real emails are sent.
+In production, emails are sent via [Resend](https://resend.com) HTTP API. Free-tier hosting platform Railway block outbound SMTP ports, so the Resend SDK is used directly instead of SMTP. In local development, emails are captured by [Mailpit](http://localhost:8025) via nodemailer — no real emails are sent.
