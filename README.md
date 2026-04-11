@@ -16,6 +16,11 @@ pnpm run db:migrate
 pnpm run dev
 ```
 
+Before starting, fill in these required values in `profiles/.env.development.local`:
+
+- `APP_API_KEY` — any secret string of your choice
+- `GITHUB_AUTH_TOKEN` — your GitHub personal access token ([create one here](https://github.com/settings/tokens))
+
 | Interface  | Address                       |
 |------------|-------------------------------|
 | REST API   | http://localhost:3000         |
